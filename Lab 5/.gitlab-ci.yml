@@ -1,0 +1,34 @@
+image: continuumio/anaconda3:2022.05
+stages:
+  - check-files
+  - lint
+
+check-lab-files:
+  tags:
+    - docker
+  stage: check-files
+  script:
+    - test -f "Lab 5/.gitignore"
+    - test -f "Lab 5/.pylintrc"
+    - test -f "Lab 5/main.py"
+    - test -f "Lab 5/README.md" || test -f "Lab 5/Readme.markdown"
+    - test -d "Lab 5/Data"
+    - test -d "Lab 5/results"
+    #- find . -name "*" -not -path "./.git/*" -not -path "./builds/*" 2>&1
+
+lint-lab:
+  tags:
+    - docker
+  stage: lint
+  script:
+    # Check formatting
+    # autopep8 ignore=C2801
+    # --exit-code
+    - autopep8 --ignore=C2801,I0021 --exit-code -d main.py
+    # Lint
+    # Upgrade pylint to latest to have same latest version in local development environment and in CI
+    - pip install pylint --upgrade
+    # pylint: disable=C2801, I0021
+    - pylint --disable=C2801,I0021 main.py
+
+
